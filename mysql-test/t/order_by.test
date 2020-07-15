@@ -2196,3 +2196,30 @@ SET max_sort_length= @save_max_sort_length;
 SET sort_buffer_size= @save_sort_buffer_size;
 SET max_length_for_sort_data= @save_max_length_for_sort_data;
 DROP TABLE t1;
+
+--echo #
+--echo # MDEV-13275: Query optimizer not picking optimal ORDER BY PRIMARY in case of
+--echo # INNER JOIN on PRIMARY like it does for similar WHERE condition
+--echo #
+
+CREATE TABLE `t1` (id char(32) NOT NULL PRIMARY KEY);
+CREATE TABLE `t2` (id char(32) NOT NULL PRIMARY KEY);
+
+INSERT INTO t1 VALUES (0), (1), (2), (3), (4), (5), (6), (7), (8), (9);
+INSERT INTO t2 VALUES (0), (1), (2), (3);
+
+CREATE VIEW v1 AS SELECT id from t1;
+
+SET @save_optimizer_switch= @@optimizer_switch;
+SET optimizer_switch='orderby_uses_equalities=on';
+EXPLAIN SELECT t2.id FROM t2 INNER JOIN t1 ON t1.id = t2.id ORDER BY t1.id;
+SELECT t2.id FROM t2 INNER JOIN t1 ON t1.id = t2.id ORDER BY t1.id;
+
+SET optimizer_switch='orderby_uses_equalities=on';
+EXPLAIN SELECT t2.id FROM t2 INNER JOIN v1 ON v1.id = t2.id ORDER BY v1.id ;
+SELECT t2.id FROM t2 INNER JOIN v1 ON v1.id = t2.id ORDER BY v1.id ;
+
+SET optimizer_switch= @save_optimizer_switch;
+
+DROP TABLE t1,t2;
+DROP VIEW v1;

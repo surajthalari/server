@@ -12616,10 +12616,10 @@ remove_const(JOIN *join,ORDER *first_order, COND *cond,
               multiple equality the item belongs to and set item->item_equal
               accordingly.
             */
-            Item *res= item->propagate_equal_fields(join->thd,
-                                                    Value_source::
-                                                    Context_identity(),
-                                                    join->cond_equal);
+            Item *res;
+
+            res= item->propagate_equal_fields_for_comparision(join->thd,
+                                                              join->cond_equal);
             Item_equal *item_eq;
             if ((item_eq= res->get_item_equal()))
             {

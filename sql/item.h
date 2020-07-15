@@ -1619,6 +1619,8 @@ public:
                                                     COND_EQUAL *cond,
                                                     Item **place);
 
+  Item *propagate_equal_fields_for_comparision(THD *thd, COND_EQUAL *arg);
+
   /*
     @brief
     Processor used to check acceptability of an item in the defining

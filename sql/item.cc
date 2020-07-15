@@ -6596,6 +6596,39 @@ Item* Item::propagate_equal_fields_and_change_item_tree(THD *thd,
 }
 
 
+/*
+  @brief
+    Set a pointer to the multiple equality the field reference belongs to
+    (if any)
+
+  @param
+
+    arg         reference to list of multiple equalities where
+                the field (this object) is to be looked for
+
+  @details
+    This function is used to make substitution for fields when the fields
+    are going to be used for comparison.
+
+  @note
+    Currently substitution for columns of the ORDER BY clause is done
+    in this way.
+
+  @return
+    - pointer to the replacing constant item, if the field item was substituted
+    - pointer to the field item, otherwise.
+*/
+
+
+Item *Item::propagate_equal_fields_for_comparision(THD *thd, COND_EQUAL *arg)
+{
+  return propagate_equal_fields(thd,
+                                Context(ANY_SUBST,
+                                        result_type(), collation.collation),
+                                arg);
+}
+
+
 void Item_field::update_null_value() 
 { 
   /* 
