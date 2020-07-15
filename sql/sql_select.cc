@@ -4009,6 +4009,43 @@ make_join_statistics(JOIN *join, List<TABLE_LIST> &tables_list,
       }
     }
   } while (ref_changed);
+
+
+  if (join->thd->check_killed())
+  {
+    if (join->thd->killed == ABORT_QUERY)
+    {
+          /*
+            If LIMIT ROWS EXAMINED interrupted query execution, issue a warning,
+            continue with normal processing and produce an incomplete query result.
+          */
+          push_warning_printf(join->thd, Sql_condition::WARN_LEVEL_WARN,
+                              ER_QUERY_EXCEEDED_ROWS_EXAMINED_LIMIT,
+                              ER_THD(join->thd, ER_QUERY_EXCEEDED_ROWS_EXAMINED_LIMIT),
+                              join->thd->accessed_rows_and_keys,
+                              join->thd->lex->limit_rows_examined->val_uint());
+          join->thd->reset_killed();
+
+        if (!(join->select_options & SELECT_DESCRIBE))
+        {
+          if (!(join->result->send_result_set_metadata(join->fields_list,
+                                                       Protocol::SEND_NUM_ROWS |
+                                                       Protocol::SEND_EOF)))
+          {
+             join->result->send_eof();       // Should be safe
+          }
+        }
+        else
+        {
+          /*
+            For explain result_set metadata is sent in send_explain_fields
+            for SELECT queries
+          */
+          join->result->send_eof();
+        }
+    }
+    DBUG_RETURN(TRUE);
+  }
  
   join->sort_by_table= get_sort_by_table(join->order, join->group_list,
                                          join->select_lex->leaf_tables,
