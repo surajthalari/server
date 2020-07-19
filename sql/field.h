@@ -1110,6 +1110,8 @@ public:
   virtual uint32 data_length() { return pack_length(); }
   virtual uint32 sort_length() const { return pack_length(); }
 
+  uint32 sort_length_truncated(THD *thd) const;
+
   /*
     sort_suffix_length() return the length bytes needed to store the length
     for binary charset

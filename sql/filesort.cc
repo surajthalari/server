@@ -2211,9 +2211,9 @@ sortlength(THD *thd, Sort_keys *sort_keys, bool *allow_packing_for_sortkeys)
     {
       Field *field= sortorder->field;
       CHARSET_INFO *cs= sortorder->field->sort_charset();
-      sortorder->length= sortorder->field->sort_length();
+      sortorder->length= sortorder->field->sort_length_truncated(thd);
       sortorder->suffix_length= sortorder->field->sort_suffix_length();
-      sortorder->original_length= sortorder->length;
+      sortorder->original_length= sortorder->field->sort_length();
       sortorder->type= field->is_packable() ?
                        SORT_FIELD_ATTR::VARIABLE_SIZE :
                        SORT_FIELD_ATTR::FIXED_SIZE;

@@ -1013,6 +1013,19 @@ CPP_UNNAMED_NS_END
   Static help functions
 *****************************************************************************/
 
+
+/*
+  @brief
+    Return the sort_length taking into account the limit of the
+    system variable max_sort_length.
+*/
+
+uint32 Field::sort_length_truncated(THD *thd) const
+{
+  return MY_MIN(sort_length(), thd->variables.max_sort_length);
+}
+
+
 /*
   @brief
     Create a fixed size sort key part
