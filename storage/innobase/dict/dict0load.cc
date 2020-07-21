@@ -3059,7 +3059,7 @@ err_exit:
 corrupted:
 				table->corrupted = true;
 				table->file_unreadable = true;
-			} else {
+			} else if (dict_table_get_first_index(table)) {
 				const page_id_t page_id(
 					table->space,
 					dict_table_get_first_index(table)
