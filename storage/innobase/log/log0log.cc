@@ -1916,9 +1916,9 @@ wait_suspend_loop:
 		srv_purge_wakeup();
 		thread_name = "purge thread";
 		goto wait_suspend_loop;
-	case SRV_MASTER:
-		thread_name = "master thread";
-		goto wait_suspend_loop;
+       case SRV_MASTER:
+               thread_name = "master thread";
+               goto wait_suspend_loop;
 	}
 
 	/* At this point only page_cleaner should be active. We wait
